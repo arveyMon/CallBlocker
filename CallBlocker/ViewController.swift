@@ -48,9 +48,6 @@ class ViewController: UITableViewController, CNContactPickerDelegate{
         print(PhoneNumberString)
     }
     
-    
-
-    
     func getContactFromCNContact() -> [CNContact] {
         
         let contactStore = CNContactStore()
@@ -130,7 +127,7 @@ class ViewController: UITableViewController, CNContactPickerDelegate{
         blockStrings = PhoneNumberString.difference(from: whiteListString)
         //print(PhoneNumberString)
         //print(whiteListString)
-        print(blockStrings)
+        print( "Final Block List : \(blockStrings)")
         self.tableView.reloadData()
      
         
@@ -148,9 +145,6 @@ class ViewController: UITableViewController, CNContactPickerDelegate{
         cell.textLabel?.text = selectContacts[indexPath.row].givenName
         return cell
     }
-    
-    
-    
 
 }
 
