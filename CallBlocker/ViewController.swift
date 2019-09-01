@@ -32,20 +32,21 @@ class ViewController: UITableViewController, CNContactPickerDelegate{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        
         
             contacts = self.getContactFromCNContact()
-            for contact in contacts {
-                let userPhoneNumbers:[CNLabeledValue<CNPhoneNumber>] = contact.phoneNumbers
-                let firstPhoneNumber:CNPhoneNumber = userPhoneNumbers[0].value
-                let primaryPhoneNumberStr:String = firstPhoneNumber.stringValue
-                self.PhoneNumberString.append(primaryPhoneNumberStr)
-                
-            
-        }
         
-        print(PhoneNumberString)
+            print(contacts[0].givenName)
+        
+        DispatchQueue.main.async {
+        
+        for contact in self.contacts {
+            
+            self.PhoneNumberString.append(contact.phoneNumbers.first?.value.stringValue ?? "")
+            
+
+        }
+    }
+        
     }
     
     func getContactFromCNContact() -> [CNContact] {
@@ -67,14 +68,15 @@ class ViewController: UITableViewController, CNContactPickerDelegate{
         
         var results: [CNContact] = []
         
-        // Iterate all containers and append their contacts to our results array
         for container in allContainers {
             
             let fetchPredicate = CNContact.predicateForContactsInContainer(withIdentifier: container.identifier)
             
             do {
                 let containerResults = try contactStore.unifiedContacts(matching: fetchPredicate, keysToFetch: keysToFetch as! [CNKeyDescriptor])
-                results.append(contentsOf: containerResults)
+                
+                try results.append(contentsOf: containerResults)
+                print("success")
                 
             } catch {
                 print("Error fetching results for container")
@@ -82,13 +84,16 @@ class ViewController: UITableViewController, CNContactPickerDelegate{
         }
         
         
+        do {
+                 print("success2")
+            return try (results)
+       
+        } catch {
+            print("Error rturning containers")
+        }
+     
         
-        return results
     }
-
-    
-    
-    
     
     
     @IBAction func AddContacts(_ sender: Any) {
@@ -117,19 +122,20 @@ class ViewController: UITableViewController, CNContactPickerDelegate{
     func contactPicker(_ picker: CNContactPickerViewController, didSelect contacts: [CNContact]) {
         
         selectContacts = contacts
+        
         for contact in contacts
         {
-            let userPhoneNumbers:[CNLabeledValue<CNPhoneNumber>] = contact.phoneNumbers
-            let firstPhoneNumber:CNPhoneNumber = userPhoneNumbers[0].value
-            let primaryPhoneNumberStr:String = firstPhoneNumber.stringValue
-            self.whiteListString.append(primaryPhoneNumberStr)
+
+            self.whiteListString.append(contact.phoneNumbers.first?.value.stringValue ?? "")
+            
         }
-        blockStrings = PhoneNumberString.difference(from: whiteListString)
-        //print(PhoneNumberString)
-        //print(whiteListString)
-        print( "Final Block List : \(blockStrings)")
-        self.tableView.reloadData()
+        
      
+        blockStrings = PhoneNumberString.difference(from: whiteListString)
+        print( "Final Block List : \(blockStrings)")
+
+        self.tableView.reloadData()
+ 
         
     }
     func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
